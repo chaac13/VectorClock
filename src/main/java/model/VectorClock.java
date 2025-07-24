@@ -7,10 +7,11 @@ public class VectorClock {
         clock[ProcessIndex]++;
     }
 
-    public void updateOnReceive(VectorClock receivedClock){
+    public void updateOnReceive(VectorClock receivedClock, int indexReceiver){
         for (int i = 0; i < clock.length; i++) {
             clock[i] = Math.max(clock[i], receivedClock.clock[i]);
         }
+        clock[indexReceiver]++;
     }
 
     public VectorClock copy() {

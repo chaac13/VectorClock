@@ -7,27 +7,43 @@ public class Process {
     private int id;
     private VectorClock clock;
     private List<Message> receivedMessages;
-    private List<Message> readMessages;
 
-    public void LocalEvent(){
+    public void localEvent(){
         clock.increment(id);
     }
-    public void ReceiveMessage(){
+    public void receiveMessage(){
         for(Message message: receivedMessages){
             if(receivedMessages.isEmpty()) {
                 System.out.println("Não há nenhuma mensagem para ser recebida");
-                break;
             }
-            clock.updateOnReceive(message.getClock());
-            readMessages.add(message);
-            receivedMessages.remove(message);
+            clock.updateOnReceive(message.getClock(),getId());
         }
+    }
+    public void sendMessage(Process sender, int idReceiver, String text, List<Process> ProcessThread){
+        Message message = new Message(sender.getId(), sender.getClock(),text);
+        Process processReceiver = ProcessThread.get(idReceiver);
+        processReceiver.setReceivedMessages(message);
     }
 
     public Process(int id, int totalProcess) {
         this.id = id;
         this.clock = new VectorClock(totalProcess);
         this.receivedMessages = new ArrayList<>();
-        this.readMessages = new ArrayList<>();
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public VectorClock getClock() {
+        return clock;
+    }
+
+    public List<Message> getReceivedMessages() {
+        return receivedMessages;
+    }
+
+    public void setReceivedMessages(Message message){
+        this.receivedMessages.add(message);
     }
 }
