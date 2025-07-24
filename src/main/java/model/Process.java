@@ -20,6 +20,7 @@ public class Process {
         }
     }
     public void sendMessage(Process sender, int idReceiver, String text, List<Process> ProcessThread){
+        clock.increment(id);
         Message message = new Message(sender.getId(), sender.getClock(),text);
         Process processReceiver = ProcessThread.get(idReceiver);
         processReceiver.setReceivedMessages(message);
