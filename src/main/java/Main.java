@@ -1,37 +1,56 @@
-import model.Message;
 import model.Process;
+import model.VectorClock;
+import model.EventType;
+import model.EventLog;
+import model.Message;
+
+
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 public class Main {
-    public static void main(String[] args) {
-        List<Process> ProcessThread = new ArrayList<>();
+    public static void main(String[] args) throws InterruptedException {
+        int numProcess = 3;
+        List<Process> processList = new ArrayList<>();
+        List<Thread> threads = new ArrayList<>();
 
-        int numProcess = 2;
-        for(int i = 0; i< numProcess;i++){
-            ProcessThread.add(new Process(i,numProcess));
+        // Inicializar processos
+        for (int i = 0; i < numProcess; i++) {
+            processList.add(new Process(i, numProcess));
         }
-//        for(Process process: ProcessThread){
-//            process.localEvent();
-//            System.out.println(Arrays.toString(process.getClock().getClock()));//isso aqui ta horrivel kkk, mas o Evento Local ta funcionando
-//        }
-        Process process1 = ProcessThread.get(0);
-        Process process2 = ProcessThread.get(1);
-        process1.sendMessage(process1,1,"Alôooo",ProcessThread);
 
-        System.out.println(Arrays.toString(ProcessThread.get(0).getClock().getClock()));
-        System.out.println(Arrays.toString(ProcessThread.get(1).getClock().getClock()));
-        process2.receiveMessage();
-        System.out.println(Arrays.toString(ProcessThread.get(1).getClock().getClock()));
+        // Referência global da lista para envio de mensagens
+        for (Process p : processList) {
+            p.setProcessList(processList);
+        }
 
-        process2.sendMessage(process2,0,"Alôooo",ProcessThread);
-        System.out.println(Arrays.toString(ProcessThread.get(1).getClock().getClock()));
+        // Iniciar threads
+        for (Process p : processList) {
+            Thread t = new Thread(p);
+            threads.add(t);
+            t.start();
+        }
 
-        process1.receiveMessage();
-        System.out.println(Arrays.toString(ProcessThread.get(0).getClock().getClock()));
+        // Executar por um tempo fixo
+        Thread.sleep(8000); // simular por 8 segundos
 
+        // Parar execução
+        for (Process p : processList) {
+            p.stop();
+        }
 
+        for (Thread t : threads) {
+            t.join(); // Espera todas as threads terminarem
+        }
+
+        // Mostrar logs
+        System.out.println("\n--- LOG DE EVENTOS ---");
+        for (Process p : processList) {
+            System.out.println("Processo P" + p.getId() + ":");
+            for (EventLog log : p.getEventLogs()) {
+                System.out.println(log);
+            }
+            System.out.println();
+        }
     }
 }
-
